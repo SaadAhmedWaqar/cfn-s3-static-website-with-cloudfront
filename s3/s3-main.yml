@@ -17,20 +17,20 @@ Parameters:
     Type: String
     Description: Artifact Bucket Path
     # Default: "https://devops-crosstrack-training.s3.amazonaws.com/code/experienced-resource-training/saad/cfn/services/"
-    Default: "https://devops-crosstrack-training.s3.amazonaws.com/code/saad/cfn/services/"
+    #Default: "https://devops-crosstrack-training.s3.amazonaws.com/code/saad/cfn/services/"
+    Default: "https://static-website-sad.s3.amazonaws.com/code/"
 
 Resources:
-  ec2:
+  s3Stack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub "${s3ArtifactPath}ec2/ec2-app.yml"
+      TemplateURL: !Sub "${s3ArtifactPath}s3/s3-app.yml"
       Parameters:
         project: !Ref project
         app: !Ref app
         env: !Ref env
-
-        s3BucketName: static-website
-        s3VersioningStatus: Enabled
+        s3BucketName: sad-test-static-website
+        # s3VersioningStatus: Enabled
         s3IndexDocument: index.html
         s3ErrorDocument: error.html
         # ec2SecurityGroupIds: !ImportValue 
@@ -39,8 +39,8 @@ Resources:
         #   Fn::Sub: "${project}-${app}-${env}-publicSubnet01Az01Id-${AWS::Region}"
 
 Outputs:
-  ec2Id:
-    Description: EC2 main 
-    Value: !Ref ec2
+  s3Stack:
+    Description: s3 stack ID 
+    Value: !Ref s3Stack
     Export:
-      Name: !Sub "${project}-${app}-${env}-ec2Stack-${AWS::Region}"
+      Name: !Sub "${project}-${app}-${env}-s3StackId-${AWS::Region}"

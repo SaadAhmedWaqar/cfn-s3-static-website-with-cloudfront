@@ -1,0 +1,15 @@
+#S3 sync
+aws s3 sync . s3://static-website-sad/code/
+
+#VPC create dev
+aws cloudformation create-stack --stack-name training-app-dev-s3 --template-body file://s3/s3-main.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=project,ParameterValue=devops-training ParameterKey=app,ParameterValue=app ParameterKey=env,ParameterValue=dev --region us-east-1
+
+
+#vpc update dev
+
+
+
+aws cloudformation update-stack --stack-name training-app-dev-vpc --template-body file://cfn/services/vpc/vpc-main.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=project,ParameterValue=devops-training ParameterKey=app,ParameterValue=app ParameterKey=env,ParameterValue=dev --region us-east-1
+
+
+

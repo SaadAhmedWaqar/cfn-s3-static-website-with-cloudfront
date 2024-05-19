@@ -1,0 +1,51 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: main yml file for s3 bucket deployment
+Parameters:
+  project:
+    Type: String
+    Description:  Project Name
+    Default: devops-training
+  app:
+    Type: String
+    Description:  Application Name
+    Default: app
+  env:
+    Type: String
+    Description:  Environment Name
+    Default: dev
+  s3ArtifactPath:
+    Type: String
+    Description: Artifact Bucket Path
+    # Default: "https://devops-crosstrack-training.s3.amazonaws.com/code/experienced-resource-training/saad/cfn/services/"
+    #Default: "https://devops-crosstrack-training.s3.amazonaws.com/code/saad/cfn/services/"
+    Default: "https://static-website-sad.s3.amazonaws.com/code/"
+
+Resources:
+  cloudFront:
+    Type: AWS::CloudFormation::Stack
+    DependsOn:
+      # - applicationLoadBalancer
+      - cfS3Bucket
+    Properties:
+      TemplateURL: !Sub "${s3ArtifactPath}/cloudfront/cloudfront-app.yml"
+      Parameters:
+        project: !Ref project
+        app: !Ref app
+        env: !Ref env
+        originProtocolPolicy: http-only
+        lbDnsName: !GetAtt applicationLoadBalancer.Outputs.lbDnsName
+        # originKeepaliveTimeout: '60'
+        # originReadTimeout: '30'
+        s3OriginId: S3 Origin
+        albOriginId: ALB Origin
+        s3BucketName: !GetAtt cfS3Bucket.Outputs.s3BucketName
+        applicationLoadBalancerName: ApplicationLoadBalancer
+        # s3PathPattern: '/images/*'
+        # errorCachingMinTTL: 0
+        # errorCode: 403
+        # responseCode: 200
+        # errorResponsePagePath: /images/error.html
+        # queryString: true
+        # forwardCookies: all
+        viewerProtocolPolicy: allow-all
+        # httpVersion: 'http2'

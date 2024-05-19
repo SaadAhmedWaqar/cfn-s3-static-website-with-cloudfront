@@ -1,8 +1,6 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: cfn template to deploy s3 bucket
 
-
-
 Parameters:
   project:
     Type: String
@@ -16,10 +14,10 @@ Parameters:
   s3BucketName:
     Type: String
     Description: Bucket Name
-  s3VersioningStatus:
-    Type: String
-    Description: Status of Versioning
-    AllowedValues: [Enabled, Suspended]
+  # s3VersioningStatus:
+  #   Type: String
+  #   Description: Status of Versioning
+  #   AllowedValues: [Enabled, Suspended]
   s3IndexDocument:
     Type: String
     Description: The name of the index document for the website
@@ -28,18 +26,17 @@ Parameters:
     Description: The name of the error document for the website
 
 
-
 Resources:
   s3Bucket:
     Type: 'AWS::S3::Bucket'
     DeletionPolicy: Delete
     Properties:
-      BucketName: !Sub ${project}-${app}-${env}-${bucketName}-${AWS::Region}-${AWS::AccountId}
+      BucketName: !Sub ${project}-${app}-${env}-${s3BucketName}-${AWS::Region}-${AWS::AccountId}
       WebsiteConfiguration:
         IndexDocument: !Ref s3IndexDocument
         ErrorDocument: !Ref s3ErrorDocument
-      VersioningConfiguration:
-        Status: !Ref s3VersioningStatus
+      # VersioningConfiguration:
+      #   Status: !Ref s3VersioningStatus
       Tags:
         - Key: name
           Value: !Sub "${project}-${app}-${env}-s3Bucket"
@@ -50,10 +47,9 @@ Resources:
         - Key: env
           Value: !Ref env
 
-
 Outputs:
   s3BucketName:
-    Description: EC2 instance ID
+    Description: 
     Value: !Ref s3Bucket
     Export:
       Name: !Sub "${project}-${app}-${env}-s3Bucket-${AWS::Region}"
