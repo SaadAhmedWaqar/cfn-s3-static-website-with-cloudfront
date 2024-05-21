@@ -6,10 +6,9 @@ aws cloudformation create-stack --stack-name training-app-dev-s3 --template-body
 
 
 #vpc update dev
-
-
-
 aws cloudformation update-stack --stack-name training-app-dev-vpc --template-body file://cfn/services/vpc/vpc-main.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=project,ParameterValue=devops-training ParameterKey=app,ParameterValue=app ParameterKey=env,ParameterValue=dev --region us-east-1
 
+#VPC create dev
+aws cloudformation create-stack --stack-name training-app-dev-static-website --template-body file://stacks/dev/main.yml --capabilities CAPABILITY_NAMED_IAM --parameters ParameterKey=project,ParameterValue=devops-training ParameterKey=app,ParameterValue=app ParameterKey=env,ParameterValue=dev --region us-east-1
 
 

@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: "2010-09-09"
-Description: main yml file for s3 bucket deployment
+Description: root stack
 Parameters:
   project:
     Type: String
@@ -16,11 +16,23 @@ Parameters:
   s3ArtifactPath:
     Type: String
     Description: Artifact Bucket Path
-    # Default: "https://devops-crosstrack-training.s3.amazonaws.com/code/experienced-resource-training/saad/cfn/services/"
-    #Default: "https://devops-crosstrack-training.s3.amazonaws.com/code/saad/cfn/services/"
     Default: "https://static-website-sad.s3.amazonaws.com/code/"
 
+
+
 Resources:
+  s3Stack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: !Sub "${s3ArtifactPath}s3/s3-app.yml"
+      Parameters:
+        project: !Ref project
+        app: !Ref app
+        env: !Ref env
+        s3BucketName: static-website
+        s3IndexDocument: index.html
+        s3ErrorDocument: error.html
+
   cloudFront:
     Type: AWS::CloudFormation::Stack
     DependsOn:
@@ -45,10 +57,23 @@ Resources:
         # forwardCookies: all
         cfViewerProtocolPolicy: allow-all
         # httpVersion: 'http2'
+        cloudFrontOriginAccessIdentity: !GetAtt cloudFront.Outputs.cloudFrontOriginAccessIdentity
 
 Outputs:
   cloudfrontStack:
     Description: cloudfrint stack ID 
     Value: !Ref s3Stack
     Export:
+      Name: !Sub "${project}-${app}-${env}-cloudfrontStackId-${AWS::Region}"
+  s3Stack:
+    Description: s3 stack ID 
+    Value: !Ref s3Stack
+    Export:
       Name: !Sub "${project}-${app}-${env}-s3StackId-${AWS::Region}"
+
+
+
+
+
+
+

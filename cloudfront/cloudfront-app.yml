@@ -12,7 +12,7 @@ Parameters:
     Type: String
     Description: App Name
 
-  originProtocolPolicy:
+  cfOriginProtocolPolicy:
     Type: String
     Description: ''Specify protocol that cloudfront will use to connect to origin
     AllowedValues: [http-only, match-viewer, https-only]
@@ -55,7 +55,7 @@ Parameters:
   #   Type: String
   #   Description: This field is deprecated. We recommend that you use a cache policy or an 
   #                origin request policy instead of this field 
-  viewerProtocolPolicy:
+  cfViewerProtocolPolicy:
     Type: String
     Description: '' The protocol that viewers can use to access the origin  
     AllowedValues: [allow-all, https-only, redirect-to-https]
@@ -75,7 +75,7 @@ Resources:
             CustomOriginConfig:
               # OriginAccessIdentity:
               #   !Join ['', ['origin-access-identity/cloudfront/', !Ref cloudFrontOriginAccessIdentity]] 
-              OriginProtocolPolicy: !Ref 'originProtocolPolicy'
+              OriginProtocolPolicy: !Ref 'cfOriginProtocolPolicy'
               #OriginKeepaliveTimeout: !Ref 'originKeepaliveTimeout'
               #OriginReadTimeout: !Ref 'originReadTimeout'            
         # CustomErrorResponses:
@@ -93,7 +93,7 @@ Resources:
           #   QueryString: !Ref queryString
           #   Cookies:
           #     Forward: !Ref forwardCookies
-          ViewerProtocolPolicy: !Ref viewerProtocolPolicy   
+          ViewerProtocolPolicy: !Ref cfViewerProtocolPolicy   
         Enabled: true      
         # CacheBehaviors:
         # -
@@ -120,19 +120,20 @@ Resources:
           Value: !Ref app
         - Key: env
           Value: !Ref env
-  # cloudFrontOriginAccessIdentity:
-  #   Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
-  #   Properties:
-  #     CloudFrontOriginAccessIdentityConfig:
-  #       Comment: CloudFront Origin AccessIdentity
+  cloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
+    Properties:
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: CloudFront Origin AccessIdentity
 
 Outputs:
-  cloudFrontDistribution:
+  cloudFrontDistributionId:
     Value: !Ref cloudFrontDistribution
     Export:
-      Name: !Sub "${project}-${app}-${env}-cloudFrontDistribution-${AWS::Region}"
-  # cloudFrontOriginAccessIdentity: 
-  #   Value: !Ref cloudFrontOriginAccessIdentity
-  #   Export:
-  #     Name: !Sub "${project}-${app}-${env}-cloudFrontOriginAccessIdentity-${AWS::Region}"
+      Name: !Sub "${project}-${app}-${env}-cloudFrontDistributionId-${AWS::Region}"
+  cloudFrontOriginAccessIdentityId: 
+    Value: !Ref cloudFrontOriginAccessIdentity
+    Export:
+      Name: !Sub "${project}-${app}-${env}-cloudFrontOriginAccessIdentityId-${AWS::Region}"
+
 

@@ -24,17 +24,19 @@ Parameters:
   s3ErrorDocument:
     Type: String
     Description: The name of the error document for the website
-
+  cloudFrontOriginAccessIdentity:
+    Type: String
+    Description: A cloudfront user associated with s3 origins
 
 Resources:
   s3Bucket:
-    Type: 'AWS::S3::Bucket'
+    Type: AWS::S3::Bucket
     DeletionPolicy: Delete
     Properties:
       BucketName: !Sub ${project}-${app}-${env}-${s3BucketName}-${AWS::Region}-${AWS::AccountId}
       WebsiteConfiguration:
         IndexDocument: !Ref s3IndexDocument
-        ErrorDocument: !Ref s3ErrorDocument
+        #ErrorDocument: !Ref s3ErrorDocument
       # VersioningConfiguration:
       #   Status: !Ref s3VersioningStatus
       Tags:
@@ -47,9 +49,27 @@ Resources:
         - Key: env
           Value: !Ref env
 
+  bucketPolicy:
+      Type: AWS::S3::BucketPolicy
+      Properties:
+        Bucket: !Ref s3BucketName
+        PolicyDocument:
+          Version: '2012-10-17'
+          Id: ObjectPolicy
+          Statement:      
+          - Action:
+              - s3:GetObject
+              - s3:PutObject
+            Sid: Allow access to get an object from Cloudfront
+            Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${cloudFrontOriginAccessIdentity}'
+            Resource: !Sub arn:aws:s3:::${s3BucketName}/*
+
+
 Outputs:
   s3BucketName:
-    Description: 
+    Description: s3 bucket name
     Value: !Ref s3Bucket
     Export:
       Name: !Sub "${project}-${app}-${env}-s3Bucket-${AWS::Region}"

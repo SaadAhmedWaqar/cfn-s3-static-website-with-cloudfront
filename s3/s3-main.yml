@@ -29,14 +29,13 @@ Resources:
         project: !Ref project
         app: !Ref app
         env: !Ref env
-        s3BucketName: sad-test-static-website
+        s3BucketName: static-website
         # s3VersioningStatus: Enabled
         s3IndexDocument: index.html
-        s3ErrorDocument: error.html
-        # ec2SecurityGroupIds: !ImportValue 
-        #   Fn::Sub: "${project}-${app}-${env}-ec2SecurityGroupID-${AWS::Region}"
-        # ec2SubnetId: !ImportValue 
-        #   Fn::Sub: "${project}-${app}-${env}-publicSubnet01Az01Id-${AWS::Region}"
+        #s3ErrorDocument: error.html
+        cloudFrontOriginAccessIdentity: !ImportValue 
+          Fn::Sub: "${project}-${app}-${env}-cloudFrontOriginAccessIdentityId-${AWS::Region}"
+
 
 Outputs:
   s3Stack:
