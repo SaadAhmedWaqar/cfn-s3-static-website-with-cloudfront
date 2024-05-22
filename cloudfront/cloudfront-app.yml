@@ -14,55 +14,18 @@ Parameters:
 
   cfOriginProtocolPolicy:
     Type: String
-    Description: ''Specify protocol that cloudfront will use to connect to origin
+    Description: Specify protocol that cloudfront will use to connect to origin
     AllowedValues: [http-only, match-viewer, https-only]
-  # originKeepaliveTimeout:
-  #   Type: String
-  #   Description: Specifies how long, in seconds, CloudFront persists its connection to the origin
-  # originReadTimeout:
-  #   Type: String
-  #   Description: Specifies how long, in seconds, CloudFront waits for a response from the origin
   s3OriginId:
     Type: String
-    Description: ''Assign a unique name to the origin
+    Description: Assign a unique name to the origin
   s3BucketName:
     Type: String
     Description: The S3 bucket name  
-  # s3PathPattern:
-  #   Type: String
-  #   Description: The pattern that specifies which requests to apply the behavior to.
-  # errorCachingMinTTL:
-  #   Type: String
-  #   Description: The minimum amount of time, in seconds, that you want CloudFront to 
-  #                cache the HTTP status code specified in ErrorCode
-  # errorCode:
-  #   Type: String
-  #   Description: The HTTP status code for which you want to specify a custom error 
-  #                page and/or a caching duration 
-  # responseCode:
-  #   Type: String
-  #   Description: The HTTP status code that you want CloudFront to return to the viewer 
-  #                along with the custom error page  
-  # errorResponsePagePath:
-  #   Type: String
-  #   Description: The path to the custom error page that you want CloudFront to return to 
-  #                a viewer when your origin returns the HTTP status code specified by ErrorCode 
-  # queryString:
-  #   Type: String
-  #   Description: This field is deprecated. We recommend that you use a cache policy or an 
-  #                origin request policy instead of this field 
-  # forwardCookies:
-  #   Type: String
-  #   Description: This field is deprecated. We recommend that you use a cache policy or an 
-  #                origin request policy instead of this field 
   cfViewerProtocolPolicy:
     Type: String
-    Description: '' The protocol that viewers can use to access the origin  
+    Description: The protocol that viewers can use to access the origin  
     AllowedValues: [allow-all, https-only, redirect-to-https]
-  # httpVersion:
-  #   Type: String
-  #   Description: Specify the maximum HTTP version(s) that you want viewers to use to 
-  #                communicate with CloudFront
 
 Resources:
   cloudFrontDistribution:
@@ -72,45 +35,19 @@ Resources:
         Origins:
           - DomainName: !Sub "${s3BucketName}.s3.${AWS::Region}.amazonaws.com"  
             Id: !Ref s3OriginId
+            S3OriginConfig:
+              OriginAccessIdentity:
+                !Join ['', ['origin-access-identity/cloudfront/', !Ref cloudFrontOriginAccessIdentity]]
             CustomOriginConfig:
-              # OriginAccessIdentity:
-              #   !Join ['', ['origin-access-identity/cloudfront/', !Ref cloudFrontOriginAccessIdentity]] 
-              OriginProtocolPolicy: !Ref 'cfOriginProtocolPolicy'
-              #OriginKeepaliveTimeout: !Ref 'originKeepaliveTimeout'
-              #OriginReadTimeout: !Ref 'originReadTimeout'            
-        # CustomErrorResponses:
-        # -
-        #   ErrorCachingMinTTL: !Ref errorCachingMinTTL
-        #   ErrorCode: !Ref errorCode
-        #   ResponseCode: !Ref responseCode
-        #   ResponsePagePath: !Ref errorResponsePagePath              
+              OriginProtocolPolicy: !Ref cfOriginProtocolPolicy
+            
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
             - HEAD
           TargetOriginId: !Ref s3OriginId
-          # ForwardedValues:
-          #   QueryString: !Ref queryString
-          #   Cookies:
-          #     Forward: !Ref forwardCookies
           ViewerProtocolPolicy: !Ref cfViewerProtocolPolicy   
         Enabled: true      
-        # CacheBehaviors:
-        # -
-        #   AllowedMethods:
-        #     - GET
-        #     - HEAD
-        #   CachedMethods:
-        #     - GET
-        #     - HEAD
-        #   TargetOriginId: !Ref s3OriginId
-        #   ForwardedValues:
-        #     QueryString: !Ref queryString
-        #     Cookies:
-        #       Forward: !Ref forwardCookies
-          # ViewerProtocolPolicy: !Ref viewerProtocolPolicy
-          # PathPattern: !Ref s3PathPattern
-        # HttpVersion: !Ref httpVersion
       Tags:
         - Key: name
           Value: !Sub "${project}-${app}-${env}-cloudFrontDistribution"
@@ -131,9 +68,9 @@ Outputs:
     Value: !Ref cloudFrontDistribution
     Export:
       Name: !Sub "${project}-${app}-${env}-cloudFrontDistributionId-${AWS::Region}"
-  cloudFrontOriginAccessIdentityId: 
-    Value: !Ref cloudFrontOriginAccessIdentity
-    Export:
-      Name: !Sub "${project}-${app}-${env}-cloudFrontOriginAccessIdentityId-${AWS::Region}"
+  # cloudFrontOriginAccessIdentityId: 
+  #   Value: !Ref cloudFrontOriginAccessIdentity
+  #   Export:
+  #     Name: !Sub "${project}-${app}-${env}-cloudFrontOriginAccessIdentityId-${AWS::Region}"
 
 

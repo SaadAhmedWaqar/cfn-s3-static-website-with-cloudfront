@@ -23,8 +23,6 @@ Parameters:
 Resources:
   cloudFront:
     Type: AWS::CloudFormation::Stack
-    DependsOn:
-      - s3Stack
     Properties:
       TemplateURL: !Sub "${s3ArtifactPath}/cloudfront/cloudfront-app.yml"
       Parameters:
@@ -32,19 +30,10 @@ Resources:
         app: !Ref app
         env: !Ref env
         cfOriginProtocolPolicy: http-only
-        # originKeepaliveTimeout: '60'
-        # originReadTimeout: '30'
         s3OriginId: S3 Origin
         s3BucketName: !GetAtt s3Stack.Outputs.s3BucketName
-        # s3PathPattern: '/images/*'
-        # errorCachingMinTTL: 0
-        # errorCode: 403
-        # responseCode: 200
-        # errorResponsePagePath: /images/error.html
-        # queryString: true
-        # forwardCookies: all
         cfViewerProtocolPolicy: allow-all
-        # httpVersion: 'http2'
+
 
 Outputs:
   cloudfrontStack:

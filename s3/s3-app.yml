@@ -4,7 +4,7 @@ Description: cfn template to deploy s3 bucket
 Parameters:
   project:
     Type: String
-    Description: Project Name
+    Description: Project Name hehe
   env:
     Type: String
     Description: Environment Name
@@ -24,9 +24,9 @@ Parameters:
   s3ErrorDocument:
     Type: String
     Description: The name of the error document for the website
-  cloudFrontOriginAccessIdentity:
-    Type: String
-    Description: A cloudfront user associated with s3 origins
+  # cloudFrontOriginAccessIdentity:
+  #   Type: String
+  #   Description: A cloudfront user associated with s3 origins
 
 Resources:
   s3Bucket:
@@ -34,9 +34,14 @@ Resources:
     DeletionPolicy: Delete
     Properties:
       BucketName: !Sub ${project}-${app}-${env}-${s3BucketName}-${AWS::Region}-${AWS::AccountId}
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
       WebsiteConfiguration:
         IndexDocument: !Ref s3IndexDocument
-        #ErrorDocument: !Ref s3ErrorDocument
+        # ErrorDocument: !Ref s3ErrorDocument
       # VersioningConfiguration:
       #   Status: !Ref s3VersioningStatus
       Tags:
@@ -49,22 +54,38 @@ Resources:
         - Key: env
           Value: !Ref env
 
+  # SampleBucketPolicy:
+  #   Type: AWS::S3::BucketPolicy
+  #   Properties:
+  #     Bucket: !Ref s3Bucket  #"devops-training-app-dev-static-website-us-east-1-414432075221"
+  #     PolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #         - Action:
+  #             - '*'
+  #           Effect: Allow
+  #           Resource:
+  #             !Sub arn:aws:s3:::${project}-${app}-${env}-${s3BucketName}-${AWS::Region}-${AWS::AccountId}/*
+  #             # - arn:aws:s3:::devops-training-app-dev-static-website-us-east-1-414432075221
+  #             # - arn:aws:s3:::devops-training-app-dev-static-website-us-east-1-414432075221/*
+  #           Principal: '*'
+  
   bucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        Bucket: !Ref s3BucketName
-        PolicyDocument:
-          Version: '2012-10-17'
-          Id: ObjectPolicy
-          Statement:      
-          - Action:
-              - s3:GetObject
-              - s3:PutObject
-            Sid: Allow access to get an object from Cloudfront
-            Effect: Allow
-            Principal:
-              AWS: !Sub 'arn:aws:iam::cloudfront:user/CloudFront Origin Access Identity ${cloudFrontOriginAccessIdentity}'
-            Resource: !Sub arn:aws:s3:::${s3BucketName}/*
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref s3Bucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Id: ObjectPolicy
+        Statement:      
+        - Action:
+            - s3:GetObject
+            - s3:PutObject
+          Effect: Allow
+          Principal: '*'
+            # Service:
+            #   - s3.amazonaws.com
+          Resource: !Sub arn:aws:s3:::${project}-${app}-${env}-${s3BucketName}-${AWS::Region}-${AWS::AccountId}/*
 
 
 Outputs:
